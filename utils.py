@@ -1,6 +1,6 @@
 import re
 
-# this is working as expected
+
 def extract_sol_num(subject):
     pattern = r'.Nueva\s+asignacion\s+de\s+pedido\s+-\s+(\w+-\d{4}-[A-Z]\d{1,4}-\d+).'
     match = re.search(pattern, subject)
@@ -8,16 +8,18 @@ def extract_sol_num(subject):
         return match.group(1)
     return None
 
-# get the SDATOOL
+# Obtener la SDATOOL
 def extract_sdatool_value(text):
     sdatool_match = re.search(r'SDATOOL:\s*(\w+)', text)
     if sdatool_match:
         return sdatool_match.group(1)
     return None
 
-# get period from sol_num
+
+# obtener periodo de sol_num
 def extract_period_from_sol_num(subject):
-    # find the first occurrence of a year (four consecutive digits) followed by a hyphen and a capital letter
+    
+# encontrar la primera aparición de un año (cuatro dígitos consecutivos) seguida de un guión y una letra mayúscula
     match = re.search(r'(\d{4})-(Q\d)', subject)
     if match:
         year = match.group(1)
@@ -26,7 +28,7 @@ def extract_period_from_sol_num(subject):
     return None
 
 
-# get cargo
+# obtener cargo
 def extract_creator(text):
     match = re.search(r'El pedido fue cargado por:\s*([A-Z\s,]+)\s*el:', text)
     if match:
@@ -34,47 +36,41 @@ def extract_creator(text):
     return None
 
 
-# get MVP from body
+# obtener MVP del body
 def extract_mvp(text):
     match = re.search(r'MVP:\s*(.+)', text)
     if match:
         return match.group(1).replace('\r', '').replace('\n', '')
     return None
 
-# get total hours
+# obtener total horas
 def extract_total_hours(text):
     match = re.search(r'Horas totales:\s*([\d,]+)', text)
     if match:
         return float(match.group(1).replace(',', '.'))
     return None
 
-# def extract_total_hours(text):
-#     # Updated regular expression to match variations
-#     match = re.search(r'\?\s*Horas totales:\s(\d{1,3}(,\d{3})\.\d{1,2}|\d+(,\d{3})(?!\d|,))', text)
-#     if match:
-#         return match.group(1)
-#     return None
 
+#obtener perfil
 def extract_profiles(text):
-    # Define the pattern to match each profile
+    # Define  el patrón para que coincida con cada perfil.
     pattern = r'Perfil\s+(\d+):(.*?)Unidades:(\d+,\d+)'
     
-    # Find all matches of the pattern in the text
+    #Encuentra todas las coincidencias del patrón en el texto. 
     matches = re.findall(pattern, text, re.DOTALL)
     
-    # Initialize a list to store profile information
+    # Inicializar una lista para almacenar información de perfil
     perfiles = []
     
-    # Iterate over the matches
+    # Iterar sobre las coincidencias
     for match in matches:
-        # Extract profile number, description, and units
+        # Extraer número de perfil, descripción y unidades.
         perfil_number = match[0]
-        # perfil_description = match[1].strip()
         perfil_description = match[1].strip().replace('\r', '').replace('\n', '')
 
         unidades = match[2]
         
-        # Store profile information in a dictionary
+        # Almacenar información de perfil en un diccionario
         perfil_info = {
             "perfil_number": perfil_number,
             "perfil_description": perfil_description,
@@ -82,14 +78,14 @@ def extract_profiles(text):
 
         }
         
-        # Add profile information to the list
+        # Agregar información de perfil a la lista
         perfiles.append(perfil_info)
     
     return perfiles
 
 
 def get_rows_to_append(subject, body):
-    # this has profile, units, 
+    # este tiene perfil, unidades,
     profiles = extract_profiles(body) 
     sol_num = extract_sol_num(subject)
     period = extract_period_from_sol_num(sol_num)
@@ -112,3 +108,15 @@ def get_rows_to_append(subject, body):
         ]
         data_to_insert.append(row)
     return data_to_insert
+
+
+# this function receives the 'inbox'
+def build_folder_dict(folder, path=''):
+    folder_dict = {}
+    full_path = path + '/' + folder.Name if path else folder.Name
+    # folder_dict[full_path] = folder
+    folder_dict[folder.Name] = full_path
+    subfolders = folder.Folders
+    for subfolder in subfolders:
+        folder_dict.update(build_folder_dict(subfolder, full_path))
+    return folder_dict
