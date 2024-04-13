@@ -22,12 +22,7 @@ def on_submit():
     outlook = connect_outlook()
     i= 0
     for folder in folders_list:
-        print(i)
-        print(folder)
-        if i == 0:
-            print("helloooo")
-            # continue
-        else:
+        if i != 0:
             outlook= outlook.Folders(folder)
         i= i+1
     
