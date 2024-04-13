@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkcalendar import DateEntry
+from PIL import Image, ImageTk
 
 from mails import leer_correos_outlook_y_guardar_en_excel, get_inbox_folders, connect_outlook
 
@@ -15,14 +16,9 @@ folders_dic = get_inbox_folders()
 
 def on_submit():
     start_date = start_date_entry.get_date()
-    print("start_date", start_date)
     end_date = end_date_entry.get_date()
-    print("end_date", end_date)
-    print("folders", folders_dic)
     inbox_path = folders_dic[selected_button]
-    print("inbox", inbox_path)
     folders_list = inbox_path.split('/')
-    print("Folders separated:", folders_list )
     outlook = connect_outlook()
     i= 0
     for folder in folders_list:
@@ -42,10 +38,15 @@ def on_button_click(label):
     selected_button = label
    
 
+total_rows = 2
 def create_buttons(frame):
+    global total_rows
     for i, label in enumerate(folders_dic):
+        module = i%3
+        if(i != 0 and module == 0):
+            total_rows= total_rows+1
         button = ttk.Button(frame, text=label, command=lambda l=label: on_button_click(l))
-        button.grid(row=3, column=i, padx=5, pady=5)
+        button.grid(row=total_rows+1, column=i%3, padx=5, pady=5)
 
 root = tk.Tk()
 root.title("Create ")
@@ -78,5 +79,12 @@ create_buttons(frame)
 get_dates_button = ttk.Button(frame, text="Search emails and process data", command=on_submit)
 get_dates_button.grid(row=2, columnspan=2, pady=10)
 
+# Add an image below the buttons
+resized_image = Image.open("images.png")  # Replace "image_below_buttons.jpg" with your image file
+resized_image = resized_image.resize((400, 150))
+resized_photo = ImageTk.PhotoImage(resized_image)
+# Add an image below the buttons
+image_label = ttk.Label(frame, image=resized_photo)
+image_label.grid(row=5, columnspan=3)
 
 root.mainloop()
