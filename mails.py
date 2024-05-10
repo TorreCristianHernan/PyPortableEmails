@@ -4,8 +4,10 @@ from datetime import datetime, timedelta
 import pytz
 
 from utils import get_rows_to_append, build_folder_dict  # Assuming you have a utility function to extract data from email body
+import os
 
-excel_name = "template1.xlsx"
+basedir = os.path.dirname(__file__)
+excel_name = os.path.join(basedir, "utils", "template1.xlsx")
 
 def get_first_empty_row(worksheet):
     for row in worksheet.iter_rows():

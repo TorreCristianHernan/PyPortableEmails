@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkcalendar import DateEntry
 from PIL import Image, ImageTk
-
+import os
 from mails import leer_correos_outlook_y_guardar_en_excel, get_inbox_folders, connect_outlook
 
 # Ejecutar la función
@@ -53,8 +53,14 @@ selected_folder.set("Select a folder")
 get_dates_button = ttk.Button(frame, text="Search emails and process data", command=on_submit)
 get_dates_button.grid(row=3, columnspan=2, pady=10)
 
+
+
+basedir = os.path.dirname(__file__)
+
+# resized_image = Image.open("images.png")
+resized_image = Image.open(os.path.join(basedir, "images", "images.png"))
 # Add an image below the buttons
-resized_image = Image.open("images.png")
+# resized_image = Image.open("images/images.png")
 resized_image = resized_image.resize((400, 150))
 resized_photo = ImageTk.PhotoImage(resized_image)
 image_label = ttk.Label(frame, image=resized_photo)
